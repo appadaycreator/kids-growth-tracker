@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>子どもの成長記録ダッシュボード | KidsGrowth</title>
+  <meta name="description" content="お子さまの身長・体重・発達マイルストーン・予防接種を一元管理。成長グラフで発育の推移を可視化する無料の子ども成長記録アプリです。複数のお子さまに対応、データは端末内のみに保存。">
+  <meta property="og:title" content="子どもの成長記録ダッシュボード | KidsGrowth">
+  <meta property="og:description" content="お子さまの身長・体重・発達マイルストーン・予防接種を一元管理。成長グラフで発育推移を可視化。無料で今すぐ使える！">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://appadaycreator.github.io/kids-growth-tracker/">
+  <meta property="og:image" content="https://appadaycreator.github.io/kids-growth-tracker/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="AppaDayCreator">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://appadaycreator.github.io/kids-growth-tracker/ogp.png">
+  <link rel="canonical" href="https://appadaycreator.github.io/kids-growth-tracker/">
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8427583028015858" crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "子どもの成長記録ダッシュボード",
+    "description": "お子さまの身長・体重・発達マイルストーン・予防接種を一元管理する無料ツール",
+    "url": "https://appadaycreator.github.io/kids-growth-tracker/",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+    "author": { "@type": "Organization", "name": "Tech&Brace", "url": "https://techbrace.jp" },
+    "inLanguage": "ja"
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #f5f3ff;
+      --primary-border: #ddd6fe;
+      --accent: #ec4899;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f8f7ff;
+      --card: #ffffff;
+      --text: #1e1b4b;
+      --body: #374151;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow-sm: 0 1px 3px rgba(124,58,237,.06),0 1px 2px rgba(0,0,0,.04);
+      --shadow: 0 4px 6px -1px rgba(124,58,237,.08),0 2px 4px -2px rgba(0,0,0,.05);
+      --shadow-md: 0 10px 15px -3px rgba(124,58,237,.1),0 4px 6px -4px rgba(0,0,0,.07);
+      --shadow-lg: 0 20px 25px -5px rgba(124,58,237,.12),0 8px 10px -6px rgba(0,0,0,.08);
+      --radius-sm: 8px;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --font: 'Inter','Noto Sans JP',system-ui,sans-serif;
+      --ease: all .2s ease-out;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--body);min-height:100vh;line-height:1.6}
+
+    /* ── Header ─────────────────── */
+    .app-header{background:#fff;border-bottom:1px solid var(--border);padding:0 1.5rem;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:1.25rem;height:64px}
+    .logo{display:flex;align-items:center;gap:.5rem;text-decoration:none}
+    .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.125rem}
+    .logo-text{font-size:1.05rem;font-weight:800;color:var(--text);letter-spacing:-.02em}
+    .hdivider{width:1px;height:24px;background:var(--border);flex-shrink:0}
+    .child-selector{display:flex;align-items:center;gap:.5rem;flex:1;overflow-x:auto;padding:.5rem 0}
+    .child-pill{display:inline-flex;align-items:center;gap:.375rem;padding:.375rem .875rem;border-radius:999px;font-size:.8125rem;font-weight:600;cursor:pointer;border:1.5px solid transparent;background:var(--primary-light);color:var(--primary);transition:var(--ease);white-space:nowrap;flex-shrink:0}
+    .child-pill:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+    .child-pill.active{background:var(--primary);color:#fff}
+    .add-child-btn{width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
+    .add-child-btn:hover{background:var(--primary-light);transform:scale(1.1)}
+
+    /* ── Main ────────────────────── */
+    .main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+
+    /* ── Hero card ───────────────── */
+    .hero-card{background:linear-gradient(135deg,#7c3aed 0%,#a855f7 55%,#ec4899 100%);border-radius:var(--radius-xl);padding:2.5rem;color:#fff;margin-bottom:2rem;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,.35)}
+    .hero-card::before,.hero-card::after{content:'';position:absolute;border-radius:50%;pointer-events:none}
+    .hero-card::before{width:280px;height:280px;background:rgba(255,255,255,.08);top:-40%;right:-5%}
+    .hero-card::after{width:160px;height:160px;background:rgba(255,255,255,.05);bottom:-20%;right:28%}
+    .hero-content{position:relative;z-index:1}
+    .hero-name{font-size:2rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.25rem}
+    .hero-age{font-size:.9375rem;opacity:.82;margin-bottom:2rem}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.75rem}
+    .hero-stat{background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border-radius:var(--radius);padding:1.25rem 1.5rem;border:1px solid rgba(255,255,255,.22)}
+    .hero-stat-label{font-size:.6875rem;opacity:.8;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+    .hero-stat-value{font-size:1.875rem;font-weight:800;letter-spacing:-.03em}
+    .hero-stat-unit{font-size:.875rem;opacity:.8;margin-left:.2rem}
+    .progress-label{display:flex;justify-content:space-between;font-size:.8125rem;opacity:.9;margin-bottom:.5rem}
+    .progress-bar{height:8px;background:rgba(255,255,255,.25);border-radius:999px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:999px;background:rgba(255,255,255,.9);transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+    /* ── Tabs ────────────────────── */
+    .tabs-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:2rem}
+    .tabs-header{display:flex;border-bottom:1px solid var(--border);padding:0 .5rem;overflow-x:auto}
+    .tab-btn{display:flex;align-items:center;gap:.5rem;padding:.9375rem 1.25rem;font-size:.875rem;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:var(--ease);white-space:nowrap;font-family:var(--font)}
+    .tab-btn:hover{color:var(--primary)}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-icon{font-size:1.125rem}
+    .tab-content{padding:2rem}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ── Cards ───────────────────── */
+    .card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.75rem;transition:var(--ease)}
+    .card:hover{box-shadow:var(--shadow)}
+    .card-title{font-size:.9375rem;font-weight:700;color:var(--text);margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+
+    /* ── Form ────────────────────── */
+    .form-group{margin-bottom:1.25rem}
+    .form-label{display:block;font-size:.8125rem;font-weight:600;color:var(--text);margin-bottom:.5rem}
+    .form-input{width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font);background:#fff;color:var(--body);transition:var(--ease);-webkit-appearance:none}
+    .form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.75rem;align-items:end}
+
+    /* ── Buttons ─────────────────── */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;padding:.75rem 1.5rem;border-radius:var(--radius-sm);font-size:.875rem;font-weight:600;cursor:pointer;border:none;transition:var(--ease);font-family:var(--font);min-height:44px;letter-spacing:-.01em}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(124,58,237,.35)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-secondary{background:var(--primary-light);color:var(--primary)}
+    .btn-secondary:hover{background:var(--primary-border);transform:translateY(-1px)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+    .btn-ghost:hover{background:var(--bg);color:var(--text)}
+    .btn-danger{background:#fee2e2;color:#dc2626}
+    .btn-danger:hover{background:#fecaca}
+    .btn-sm{padding:.4375rem .875rem;font-size:.8125rem;min-height:36px}
+
+    /* ── Chart ───────────────────── */
+    .chart-tabs{display:flex;gap:.5rem;margin-bottom:1.25rem}
+    .chart-tab{padding:.375rem .875rem;border-radius:999px;font-size:.8125rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--muted);transition:var(--ease);font-family:var(--font)}
+    .chart-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .chart-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+    /* ── Table ───────────────────── */
+    .data-table{width:100%;border-collapse:collapse}
+    .data-table th{text-align:left;font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:.75rem 1rem;background:var(--bg);border-bottom:1px solid var(--border)}
+    .data-table td{padding:.875rem 1rem;font-size:.875rem;border-bottom:1px solid #f3f4f6;color:var(--body)}
+    .data-table tr:hover td{background:var(--primary-light)}
+    .data-table tr:last-child td{border-bottom:none}
+
+    /* ── Milestones ──────────────── */
+    .ms-section{margin-bottom:2rem}
+    .ms-section-title{font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+    .ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem}
+    .ms-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;align-items:center;gap:1rem;transition:var(--ease);cursor:pointer}
+    .ms-card:hover{border-color:var(--primary-border);box-shadow:var(--shadow);transform:translateY(-2px)}
+    .ms-card.achieved{background:var(--primary-light);border-color:var(--primary-border)}
+    .ms-icon{width:44px;height:44px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;transition:var(--ease)}
+    .ms-card.achieved .ms-icon{background:var(--primary)}
+    .ms-info{flex:1;min-width:0}
+    .ms-name{font-size:.9375rem;font-weight:700;color:var(--text)}
+    .ms-target{font-size:.8125rem;color:var(--muted);margin-top:.125rem}
+    .ms-date{font-size:.8rem;color:var(--primary);font-weight:600;margin-top:.25rem}
+    .ms-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--ease)}
+    .ms-card.achieved .ms-check{background:var(--primary);border-color:var(--primary);color:#fff}
+
+    /* ── Vaccines ────────────────── */
+    .vax-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:.75rem;transition:var(--ease);background:#fff}
+    .vax-item:hover{border-color:var(--primary-border);box-shadow:var(--shadow-sm)}
+    .vax-item.done{border-color:var(--success);background:#f0fdf4}
+    .vax-badge{padding:.25rem .625rem;border-radius:999px;font-size:.6875rem;font-weight:700;flex-shrink:0}
+    .badge-teiki{background:#dbeafe;color:#1d4ed8}
+    .badge-ninni{background:#fef3c7;color:#92400e}
+    .vax-info{flex:1;min-width:0}
+    .vax-name{font-weight:700;color:var(--text);font-size:.9375rem}
+    .vax-timing{font-size:.8125rem;color:var(--muted);margin-top:.125rem}
+    .vax-date{padding:.375rem .75rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.8125rem;font-family:var(--font);width:150px;transition:var(--ease)}
+    .vax-date:focus{outline:none;border-color:var(--primary)}
+
+    /* ── Memory ──────────────────── */
+    .memory-form{background:var(--primary-light);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.75rem;border:1px solid var(--primary-border)}
+    .mem-textarea{width:100%;padding:1rem;border:1.5px solid var(--primary-border);border-radius:var(--radius);font-size:.9rem;font-family:var(--font);resize:vertical;min-height:100px;background:#fff;color:var(--body);transition:var(--ease)}
+    .mem-textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+    .emoji-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.875rem}
+    .emoji-btn{display:inline-flex;align-items:center;gap:.3rem;padding:.375rem .75rem;border-radius:999px;font-size:.8125rem;cursor:pointer;background:#fff;border:1.5px solid var(--primary-border);color:var(--body);transition:var(--ease)}
+    .emoji-btn:hover,.emoji-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);transform:scale(1.05)}
+    .mem-card{background:#fff;border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow-sm);border-left:3px solid var(--primary);transition:var(--ease)}
+    .mem-card:hover{box-shadow:var(--shadow);transform:translateX(2px)}
+    .mem-date{font-size:.75rem;color:var(--muted);margin-bottom:.375rem}
+    .mem-text{color:var(--body);line-height:1.75}
+    .mem-emoji{font-size:1.375rem;margin-right:.375rem}
+
+    /* ── Empty state ─────────────── */
+    .empty{text-align:center;padding:4rem 2rem;color:var(--muted)}
+    .empty-icon{font-size:3rem;margin-bottom:1rem}
+    .empty-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.5rem}
+    .empty-desc{font-size:.875rem}
+
+    /* ── Toast ───────────────────── */
+    .toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.75rem}
+    .toast{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border-radius:var(--radius);box-shadow:var(--shadow-lg);font-size:.875rem;font-weight:600;animation:slideIn .3s ease-out;max-width:300px}
+    .toast-ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+    .toast-err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+    /* ── Modal ───────────────────── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:var(--ease)}
+    .overlay.active{opacity:1;pointer-events:all}
+    .modal{background:#fff;border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:440px;box-shadow:var(--shadow-lg);transform:scale(.95);transition:var(--ease)}
+    .overlay.active .modal{transform:scale(1)}
+    .modal-title{font-size:1.125rem;font-weight:800;color:var(--text);margin-bottom:1.5rem}
+    .modal-footer{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.5rem}
+
+    /* ── Affiliate ───────────────── */
+    .aff-section{background:#fff;border-radius:var(--radius-lg);padding:1.75rem;margin-top:1.75rem;box-shadow:var(--shadow-sm)}
+    .aff-title{font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:1.25rem}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+    .product-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-decoration:none;color:inherit;display:block;transition:var(--ease)}
+    .product-card:hover{border-color:var(--primary-border);box-shadow:var(--shadow);transform:translateY(-2px)}
+    .product-icon{font-size:2rem;margin-bottom:.625rem}
+    .product-name{font-size:.875rem;font-weight:600;color:var(--text);margin-bottom:.375rem;line-height:1.4}
+    .product-cta{font-size:.8125rem;color:var(--primary);font-weight:700}
+
+    /* ── FAQ ─────────────────────── */
+    .faq-item{border-bottom:1px solid var(--border)}
+    .faq-q{width:100%;text-align:left;font-size:.9375rem;font-weight:600;color:var(--text);background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.25rem 0;transition:var(--ease);font-family:var(--font)}
+    .faq-q:hover{color:var(--primary)}
+    .faq-a{font-size:.875rem;color:var(--muted);margin-top:.25rem;line-height:1.75;padding-bottom:1.25rem;display:none}
+    .faq-a.open{display:block}
+    .faq-arrow{transition:transform .2s;flex-shrink:0}
+    .faq-q[aria-expanded="true"] .faq-arrow{transform:rotate(180deg)}
+
+    /* ── Related ─────────────────── */
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.875rem}
+
+    /* ── Loading ─────────────────── */
+    .loading-overlay{position:fixed;inset:0;background:rgba(248,247,255,.9);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s}
+    .loading-overlay.active{opacity:1;pointer-events:all}
+    .spinner{width:40px;height:40px;border:3px solid var(--primary-border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Footer ──────────────────── */
+    .footer{background:#fff;border-top:1px solid var(--border);padding:2rem 1.5rem;margin-top:3rem;text-align:center}
+    .footer-links{display:flex;justify-content:center;gap:1.5rem;margin-bottom:.875rem;flex-wrap:wrap}
+    .footer-links a{font-size:.8125rem;color:var(--muted);text-decoration:none;transition:var(--ease)}
+    .footer-links a:hover{color:var(--primary)}
+    .footer-copy{font-size:.75rem;color:var(--muted)}
+
+    /* ── Responsive ──────────────── */
+    @media(max-width:768px){
+      .hero-stats{grid-template-columns:1fr 1fr}
+      .form-row{grid-template-columns:1fr 1fr}
+      .grid-2{grid-template-columns:1fr}
+      .hero-card{padding:1.75rem}
+      .hero-name{font-size:1.625rem}
+      .hero-stat-value{font-size:1.5rem}
+    }
+    @media(max-width:480px){
+      .hero-stats{grid-template-columns:1fr}
+      .ms-grid{grid-template-columns:1fr}
+      .form-row{grid-template-columns:1fr}
+      .main{padding:1.25rem 1rem}
+      .tab-content{padding:1.25rem}
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay"><div class="spinner"></div></div>
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- Modal: Add child -->
+<div class="overlay" id="modal-add-child">
+  <div class="modal">
+    <div class="modal-title">👶 お子さまを追加</div>
+    <div class="form-group">
+      <label class="form-label">お名前（ニックネームでもOK）</label>
+      <input type="text" id="input-child-name" class="form-input" placeholder="例: たろう" maxlength="20" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">生年月日</label>
+      <input type="date" id="input-child-birth" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">性別</label>
+      <select id="input-child-gender" class="form-input">
+        <option value="">未回答</option>
+        <option value="male">男の子</option>
+        <option value="female">女の子</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-child')">キャンセル</button>
+      <button class="btn btn-primary" onclick="addChild()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Milestone -->
+<div class="overlay" id="modal-milestone">
+  <div class="modal">
+    <div class="modal-title" id="ms-modal-title">⭐ マイルストーン達成日</div>
+    <div class="form-group">
+      <label class="form-label">達成した日付</label>
+      <input type="date" id="input-ms-date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ（任意）</label>
+      <input type="text" id="input-ms-memo" class="form-input" placeholder="例: 朝起きたら突然できていた！" maxlength="100">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" id="ms-modal-clear" onclick="clearMilestone()">記録を消す</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-milestone')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveMilestone()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="header-inner">
+    <a href="." class="logo">
+      <div class="logo-icon">🌱</div>
+      <span class="logo-text">KidsGrowth</span>
+    </a>
+    <div class="hdivider"></div>
+    <div class="child-selector" id="child-selector"></div>
+    <button class="add-child-btn" onclick="openModal('modal-add-child')" title="お子さまを追加">＋</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- No child -->
+  <div id="view-empty" style="display:none">
+    <div class="empty" style="padding:6rem 2rem">
+      <div class="empty-icon">👶</div>
+      <div class="empty-title">お子さまを登録しましょう</div>
+      <div class="empty-desc" style="margin-bottom:2rem">右上の「＋」ボタンから、お子さまの情報を追加してください</div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-child')">＋ お子さまを追加</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="view-dashboard" style="display:none">
+
+    <!-- Hero -->
+    <div class="hero-card">
+      <div class="hero-content">
+        <div class="hero-name" id="hero-name">-</div>
+        <div class="hero-age" id="hero-age">-</div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-label">最新の身長</div>
+            <div class="hero-stat-value"><span id="stat-height">--</span><span class="hero-stat-unit">cm</span></div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">最新の体重</div>
+            <div class="hero-stat-value"><span id="stat-weight">--</span><span class="hero-stat-unit">kg</span></div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">記録回数</div>
+            <div class="hero-stat-value" id="stat-count">0</div>
+          </div>
+        </div>
+        <div class="progress-label"><span>発達マイルストーン達成率</span><span id="ms-progress-txt">0/13</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="ms-progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-card">
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tab-growth" onclick="switchTab('growth')"><span class="tab-icon">📏</span> 成長記録</button>
+        <button class="tab-btn" id="tab-milestone" onclick="switchTab('milestone')"><span class="tab-icon">⭐</span> マイルストーン</button>
+        <button class="tab-btn" id="tab-vaccine" onclick="switchTab('vaccine')"><span class="tab-icon">💉</span> 予防接種</button>
+        <button class="tab-btn" id="tab-memory" onclick="switchTab('memory')"><span class="tab-icon">📔</span> 思い出</button>
+      </div>
+
+      <div class="tab-content">
+
+        <!-- Growth -->
+        <div class="tab-panel active" id="panel-growth">
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-title">📏 新しい記録を追加</div>
+            <div class="form-row">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">日付</label>
+                <input type="date" id="r-date" class="form-input" required>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">身長（cm）</label>
+                <input type="number" id="r-height" class="form-input" placeholder="65.0" step="0.1" min="30" max="250">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">体重（kg）</label>
+                <input type="number" id="r-weight" class="form-input" placeholder="7.5" step="0.01" min="0.5" max="300">
+              </div>
+              <button class="btn btn-primary" onclick="addRecord()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>追加
+              </button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-title">📈 成長グラフ</div>
+            <div class="chart-tabs">
+              <button class="chart-tab active" id="ctab-height" onclick="switchChart('height')">身長</button>
+              <button class="chart-tab" id="ctab-weight" onclick="switchChart('weight')">体重</button>
+            </div>
+            <div class="chart-wrap">
+              <svg id="chart-svg" width="660" height="220" viewBox="0 0 660 220">
+                <text x="330" y="115" text-anchor="middle" fill="#9ca3af" font-size="14" font-family="sans-serif">データがありません</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📋 記録一覧</div>
+            <div id="records-table"></div>
+          </div>
+        </div>
+
+        <!-- Milestone -->
+        <div class="tab-panel" id="panel-milestone">
+          <div id="milestone-list"></div>
+        </div>
+
+        <!-- Vaccine -->
+        <div class="tab-panel" id="panel-vaccine">
+          <p style="font-size:.8125rem;color:var(--muted);margin-bottom:1.25rem">💡 接種日を入力すると完了マークが付きます。母子手帳と照らし合わせながら記録しましょう。</p>
+          <div id="vaccine-list"></div>
+        </div>
+
+        <!-- Memory -->
+        <div class="tab-panel" id="panel-memory">
+          <div class="memory-form">
+            <div class="card-title" style="margin-bottom:1rem">📔 今日の思い出を記録</div>
+            <div class="emoji-row" id="emoji-row">
+              <span class="emoji-btn" onclick="pickEmoji(this,'🎉')">🎉 初めて</span>
+              <span class="emoji-btn" onclick="pickEmoji(this,'😊')">😊 笑顔</span>
+              <span class="emoji-btn" onclick="pickEmoji(this,'💪')">💪 できた！</span>
+              <span class="emoji-btn" onclick="pickEmoji(this,'🍼')">🍼 ごはん</span>
+              <span class="emoji-btn" onclick="pickEmoji(this,'😴')">😴 ねんね</span>
+              <span class="emoji-btn" onclick="pickEmoji(this,'🏥')">🏥 病院</span>
+            </div>
+            <textarea id="mem-input" class="mem-textarea" placeholder="今日の出来事や気づきを書き留めましょう..."></textarea>
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:.875rem;margin-top:.875rem">
+              <span id="sel-emoji" style="font-size:1.5rem"></span>
+              <button class="btn btn-primary" onclick="addMemory()">記録する</button>
+            </div>
+          </div>
+          <div id="memory-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Amazon affiliate -->
+    <div class="aff-section">
+      <div class="aff-title">おすすめグッズ — Amazonで見る</div>
+      <div class="product-grid">
+        <a href="https://www.amazon.co.jp/dp/B09MCMRFPB?tag=appadaycrea0f-22" target="_blank" rel="nofollow" class="product-card">
+          <div class="product-icon">📏</div>
+          <div class="product-name">赤ちゃん用ベビースケール・身長体重計</div>
+          <div class="product-cta">Amazonで見る →</div>
+        </a>
+        <a href="https://www.amazon.co.jp/dp/B07QMVR2MJ?tag=appadaycrea0f-22" target="_blank" rel="nofollow" class="product-card">
+          <div class="product-icon">📓</div>
+          <div class="product-name">育児日記・母子手帳ケース</div>
+          <div class="product-cta">Amazonで見る →</div>
+        </a>
+        <a href="https://www.amazon.co.jp/dp/B083N9F8QF?tag=appadaycrea0f-22" target="_blank" rel="nofollow" class="product-card">
+          <div class="product-icon">🎯</div>
+          <div class="product-name">発達を促す知育おもちゃ</div>
+          <div class="product-cta">Amazonで見る →</div>
+        </a>
+        <a href="https://www.amazon.co.jp/dp/B07STDBVJJ?tag=appadaycrea0f-22" target="_blank" rel="nofollow" class="product-card">
+          <div class="product-icon">🌡️</div>
+          <div class="product-name">赤ちゃん用非接触体温計</div>
+          <div class="product-cta">Amazonで見る →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- A8.net affiliate -->
+    <div class="aff-section">
+      <div class="aff-title">PR — 子育て関連サービス</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+        <a href="https://px.a8.net/svt/ejp?a8mat=3Z7P3N+DUMMYCODE+KIDS01" rel="nofollow" target="_blank" class="product-card" style="display:flex;align-items:center;gap:1rem">
+          <div style="font-size:2rem">📚</div>
+          <div>
+            <div class="product-name">こどもちゃれんじ（ベネッセ）</div>
+            <div class="product-cta">詳しく見る →</div>
+          </div>
+        </a>
+        <a href="https://px.a8.net/svt/ejp?a8mat=3Z7P3N+DUMMYCODE+KIDS02" rel="nofollow" target="_blank" class="product-card" style="display:flex;align-items:center;gap:1rem">
+          <div style="font-size:2rem">🎓</div>
+          <div>
+            <div class="product-name">幼児教育・習い事の資料請求</div>
+            <div class="product-cta">詳しく見る →</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Related services -->
+    <div class="card" style="margin-top:1.75rem">
+      <div class="card-title">🔗 関連ツール</div>
+      <div class="related-grid">
+        <a href="https://appadaycreator.github.io/kids-activity-cost-simulator/" class="product-card">
+          <div class="product-name">🎯 子供の習い事費用シミュレーター</div>
+          <div class="product-cta">使ってみる →</div>
+        </a>
+        <a href="https://appadaycreator.github.io/kids-activity-finder/" class="product-card">
+          <div class="product-name">🔍 子ども活動検索</div>
+          <div class="product-cta">使ってみる →</div>
+        </a>
+        <a href="https://appadaycreator.github.io/bmi-body-tracker/" class="product-card">
+          <div class="product-name">📊 BMI・体型管理トラッカー</div>
+          <div class="product-cta">使ってみる →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card" style="margin-top:1.75rem">
+      <div class="card-title">❓ よくある質問</div>
+      <div id="faq-list"></div>
+    </div>
+
+  </div><!-- /view-dashboard -->
+</main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="usage.html">使い方</a>
+    <a href="contact.html">お問い合わせ</a>
+    <a href="privacy-policy.html">プライバシーポリシー</a>
+    <a href="terms.html">利用規約</a>
+  </div>
+  <div class="footer-copy">© 2024 Tech&Brace / KidsGrowth — データはお使いの端末内のみに保存されます</div>
+</footer>
+
+<script>
+// ──────────────────────────────────
+// Constants
+// ──────────────────────────────────
+const STORAGE_KEY = 'kidsgrowth-v1';
+
+const MILESTONES = [
+  { id:'m1', name:'首すわり', target:'3〜4ヶ月', cat:'運動発達', icon:'👶' },
+  { id:'m2', name:'寝返り', target:'4〜6ヶ月', cat:'運動発達', icon:'🔄' },
+  { id:'m3', name:'お座り', target:'6〜8ヶ月', cat:'運動発達', icon:'🧸' },
+  { id:'m4', name:'ハイハイ', target:'7〜10ヶ月', cat:'運動発達', icon:'🏃' },
+  { id:'m5', name:'つかまり立ち', target:'8〜11ヶ月', cat:'運動発達', icon:'🦺' },
+  { id:'m6', name:'ひとり立ち', target:'10〜14ヶ月', cat:'運動発達', icon:'⭐' },
+  { id:'m7', name:'ひとり歩き', target:'11〜15ヶ月', cat:'運動発達', icon:'👟' },
+  { id:'m8', name:'喃語（バブバブ）', target:'2〜6ヶ月', cat:'言語発達', icon:'💬' },
+  { id:'m9', name:'意味のある言葉', target:'12〜18ヶ月', cat:'言語発達', icon:'🗣️' },
+  { id:'m10', name:'2語文', target:'18〜24ヶ月', cat:'言語発達', icon:'📢' },
+  { id:'m11', name:'社会的微笑み', target:'1〜3ヶ月', cat:'社会性', icon:'😊' },
+  { id:'m12', name:'後追い', target:'6〜9ヶ月', cat:'社会性', icon:'🐾' },
+  { id:'m13', name:'人見知り', target:'6〜12ヶ月', cat:'社会性', icon:'🙈' },
+];
+
+const VACCINES = [
+  { id:'vax1', name:'ヒブ（Hib）感染症', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期' },
+  { id:'vax2', name:'小児用肺炎球菌', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期' },
+  { id:'vax3', name:'B型肝炎', timing:'2・3・7〜8ヶ月', type:'定期' },
+  { id:'vax4', name:'ロタウイルス', timing:'2・3（・4）ヶ月', type:'定期' },
+  { id:'vax5', name:'四種混合（DPT-IPV）', timing:'3・4・5ヶ月、18ヶ月', type:'定期' },
+  { id:'vax6', name:'BCG（結核）', timing:'5〜8ヶ月', type:'定期' },
+  { id:'vax7', name:'MR（麻疹・風疹）', timing:'1歳・就学前', type:'定期' },
+  { id:'vax8', name:'水痘（みずぼうそう）', timing:'1歳・1.5歳', type:'定期' },
+  { id:'vax9', name:'日本脳炎', timing:'3歳・4歳・9歳', type:'定期' },
+  { id:'vax10', name:'おたふくかぜ', timing:'1歳・就学前', type:'任意' },
+  { id:'vax11', name:'インフルエンザ', timing:'毎年秋（6ヶ月〜）', type:'任意' },
+];
+
+const FAQS = [
+  ['身長や体重の記録はどこに保存されますか？', 'すべてのデータはお使いのブラウザのLocalStorageに保存されます。サーバーには一切送信されず、プライバシーが完全に保護されます。'],
+  ['複数の子どもを登録できますか？', 'はい、何人でも登録できます。画面上部のヘッダーからいつでも切り替え可能です。'],
+  ['発達マイルストーンとは何ですか？', '赤ちゃん・幼児の発達の節目となる動作・能力のことです。首すわり・寝返りなど運動発達、言語発達、社会性の発達など13項目を管理できます。'],
+  ['データをバックアップする方法はありますか？', 'データはLocalStorageに保存されます。定期的にスクリーンショットを撮るか、母子手帳と併用して記録を残すことをお勧めします。'],
+  ['成長グラフはどのように使いますか？', '「成長記録」タブ内に自動的にグラフが表示されます。身長・体重それぞれのボタンで切り替えられます。2件以上のデータを登録すると推移グラフが表示されます。'],
+  ['予防接種の管理はどのようにすればいいですか？', '「予防接種」タブで各ワクチンの接種日を入力すると、完了マークが付きます。母子手帳と照らし合わせながら記録しましょう。'],
+  ['スマートフォンでも使えますか？', 'はい、モバイル対応しています。ブラウザの「ホーム画面に追加」機能でアプリのように使うこともできます。'],
+];
+
+// ──────────────────────────────────
+// State
+// ──────────────────────────────────
+let state = { children: [], activeId: null };
+let chartType = 'height';
+let pendingMsId = null;
+let selEmoji = '';
+
+// ──────────────────────────────────
+// Storage
+// ──────────────────────────────────
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {
+    console.warn('[KidsGrowth] load error', e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    toast('err', 'データの保存に失敗しました');
+    console.error('[KidsGrowth] save error', e);
+  }
+}
+
+function activeChild() {
+  return state.children.find(c => c.id === state.activeId) || null;
+}
+
+// ──────────────────────────────────
+// Child management
+// ──────────────────────────────────
+function addChild() {
+  const name = document.getElementById('input-child-name').value.trim();
+  const birth = document.getElementById('input-child-birth').value;
+  const gender = document.getElementById('input-child-gender').value;
+
+  if (!name) { toast('err', 'お名前を入力してください'); return; }
+  if (!birth) { toast('err', '生年月日を入力してください'); return; }
+
+  try {
+    const child = { id: Date.now().toString(), name, birth, gender, records: [], milestones: {}, vaccines: {}, memories: [] };
+    state.children.push(child);
+    state.activeId = child.id;
+    saveState();
+    closeModal('modal-add-child');
+    document.getElementById('input-child-name').value = '';
+    document.getElementById('input-child-birth').value = '';
+    renderAll();
+    toast('ok', `${name}を追加しました！`);
+  } catch(e) {
+    toast('err', '追加に失敗しました');
+    console.error('[KidsGrowth] addChild:', e);
+  }
+}
+
+function selectChild(id) {
+  state.activeId = id;
+  saveState();
+  renderAll();
+}
+
+function calcAge(birth) {
+  if (!birth) return '';
+  try {
+    const b = new Date(birth), now = new Date();
+    const months = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
+    if (months < 0) return '';
+    if (months < 24) return `${months}ヶ月`;
+    const y = Math.floor(months / 12), m = months % 12;
+    return m > 0 ? `${y}歳${m}ヶ月` : `${y}歳`;
+  } catch(e) { return ''; }
+}
+
+// ──────────────────────────────────
+// Growth records
+// ──────────────────────────────────
+function addRecord() {
+  const child = activeChild();
+  if (!child) { toast('err', 'お子さまを選択してください'); return; }
+
+  const date = document.getElementById('r-date').value;
+  const hRaw = document.getElementById('r-height').value;
+  const wRaw = document.getElementById('r-weight').value;
+  const h = parseFloat(hRaw);
+  const w = parseFloat(wRaw);
+
+  if (!date) { toast('err', '日付を入力してください'); return; }
+  if (hRaw === '' && wRaw === '') { toast('err', '身長か体重を入力してください'); return; }
+  if (hRaw !== '' && (isNaN(h) || h < 30 || h > 250)) { toast('err', '身長の値が正しくありません（30〜250cm）'); return; }
+  if (wRaw !== '' && (isNaN(w) || w < 0.5 || w > 300)) { toast('err', '体重の値が正しくありません（0.5〜300kg）'); return; }
+
+  try {
+    child.records.push({ id: Date.now().toString(), date, h: hRaw !== '' ? h : null, w: wRaw !== '' ? w : null });
+    child.records.sort((a, b) => a.date.localeCompare(b.date));
+    saveState();
+    document.getElementById('r-height').value = '';
+    document.getElementById('r-weight').value = '';
+    renderGrowth();
+    renderHero();
+    toast('ok', '記録を追加しました！');
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] addRecord:', e);
+  }
+}
+
+function deleteRecord(id) {
+  const child = activeChild();
+  if (!child) return;
+  try {
+    child.records = child.records.filter(r => r.id !== id);
+    saveState();
+    renderGrowth();
+    renderHero();
+    toast('ok', '記録を削除しました');
+  } catch(e) {
+    toast('err', '削除エラーが発生しました');
+    console.error('[KidsGrowth] deleteRecord:', e);
+  }
+}
+
+// ──────────────────────────────────
+// Chart
+// ──────────────────────────────────
+function switchChart(type) {
+  chartType = type;
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`ctab-${type}`).classList.add('active');
+  renderChart();
+}
+
+function renderChart() {
+  const child = activeChild();
+  const svg = document.getElementById('chart-svg');
+  if (!child) return;
+
+  const key = chartType === 'height' ? 'h' : 'w';
+  const pts = child.records.filter(r => r[key] !== null);
+
+  if (pts.length < 2) {
+    svg.innerHTML = `<text x="330" y="115" text-anchor="middle" fill="#9ca3af" font-size="14" font-family="sans-serif">${pts.length === 0 ? 'データがありません' : '2件以上記録するとグラフが表示されます'}</text>`;
+    return;
+  }
+
+  const W = 660, H = 220, PL = 52, PR = 20, PT = 20, PB = 40;
+  const cW = W - PL - PR, cH = H - PT - PB;
+  const vals = pts.map(r => r[key]);
+  const minV = Math.min(...vals), maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+  const xS = i => PL + (i / (pts.length - 1)) * cW;
+  const yS = v => PT + cH - ((v - minV) / range) * cH;
+
+  let grid = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = PT + (i / 4) * cH;
+    const v = maxV - (i / 4) * range;
+    grid += `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#f3f4f6" stroke-width="1"/>`;
+    grid += `<text x="${PL - 6}" y="${y + 4}" text-anchor="end" fill="#9ca3af" font-size="11" font-family="sans-serif">${v.toFixed(1)}</text>`;
+  }
+
+  const coords = pts.map((r, i) => `${xS(i)},${yS(r[key])}`);
+  const linePath = `M ${coords.join(' L ')}`;
+  const areaPath = `M ${xS(0)},${PT + cH} L ${coords.join(' L ')} L ${xS(pts.length - 1)},${PT + cH} Z`;
+
+  const step = Math.ceil(pts.length / 6);
+  let xLabels = '';
+  pts.forEach((r, i) => {
+    if (i % step === 0 || i === pts.length - 1) {
+      xLabels += `<text x="${xS(i)}" y="${H - 6}" text-anchor="middle" fill="#9ca3af" font-size="11" font-family="sans-serif">${r.date.slice(5)}</text>`;
+    }
+  });
+
+  const dots = pts.map((r, i) => `<circle cx="${xS(i)}" cy="${yS(r[key])}" r="5" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/>`).join('');
+
+  const last = pts[pts.length - 1];
+  const unit = chartType === 'height' ? 'cm' : 'kg';
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7c3aed" stop-opacity=".18"/>
+        <stop offset="100%" stop-color="#7c3aed" stop-opacity=".01"/>
+      </linearGradient>
+    </defs>
+    ${grid}
+    <path d="${areaPath}" fill="url(#grad)"/>
+    <path d="${linePath}" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+    ${xLabels}
+    <text x="${xS(pts.length-1)}" y="${yS(last[key]) - 12}" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="700" font-family="sans-serif">${last[key]}${unit}</text>
+  `;
+}
+
+// ──────────────────────────────────
+// Milestones
+// ──────────────────────────────────
+function openMilestoneModal(id, name) {
+  pendingMsId = id;
+  document.getElementById('ms-modal-title').textContent = `⭐ ${name}`;
+  const child = activeChild();
+  const achieved = child?.milestones[id];
+  document.getElementById('input-ms-date').value = achieved?.date || new Date().toISOString().slice(0, 10);
+  document.getElementById('input-ms-memo').value = achieved?.memo || '';
+  document.getElementById('ms-modal-clear').style.display = achieved ? 'inline-flex' : 'none';
+  openModal('modal-milestone');
+}
+
+function saveMilestone() {
+  const child = activeChild();
+  if (!child || !pendingMsId) return;
+  const date = document.getElementById('input-ms-date').value;
+  const memo = document.getElementById('input-ms-memo').value.trim();
+  if (!date) { toast('err', '日付を入力してください'); return; }
+  try {
+    child.milestones[pendingMsId] = { date, memo };
+    saveState();
+    closeModal('modal-milestone');
+    renderMilestones();
+    toast('ok', 'マイルストーンを記録しました 🎉');
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] saveMilestone:', e);
+  }
+}
+
+function clearMilestone() {
+  const child = activeChild();
+  if (!child || !pendingMsId) return;
+  try {
+    delete child.milestones[pendingMsId];
+    saveState();
+    closeModal('modal-milestone');
+    renderMilestones();
+    toast('ok', '記録を削除しました');
+  } catch(e) {
+    toast('err', 'エラーが発生しました');
+    console.error('[KidsGrowth] clearMilestone:', e);
+  }
+}
+
+function renderMilestones() {
+  const child = activeChild();
+  const el = document.getElementById('milestone-list');
+  if (!child) { el.innerHTML = ''; return; }
+
+  const cats = ['運動発達', '言語発達', '社会性'];
+  el.innerHTML = cats.map(cat => {
+    const items = MILESTONES.filter(m => m.cat === cat);
+    return `
+      <div class="ms-section">
+        <div class="ms-section-title">${cat}</div>
+        <div class="ms-grid">
+          ${items.map(m => {
+            const a = child.milestones[m.id];
+            return `
+              <div class="ms-card ${a ? 'achieved' : ''}" onclick="openMilestoneModal('${m.id}','${m.name.replace(/'/g,"\\'")}')">
+                <div class="ms-icon">${m.icon}</div>
+                <div class="ms-info">
+                  <div class="ms-name">${m.name}</div>
+                  <div class="ms-target">目安: ${m.target}</div>
+                  ${a ? `<div class="ms-date">✅ ${a.date}${a.memo ? ' — ' + a.memo : ''}</div>` : ''}
+                </div>
+                <div class="ms-check">${a ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  renderMsProgress();
+}
+
+function renderMsProgress() {
+  const child = activeChild();
+  if (!child) return;
+  const done = Object.keys(child.milestones).length;
+  const total = MILESTONES.length;
+  const pct = Math.round((done / total) * 100);
+  const fill = document.getElementById('ms-progress-fill');
+  const txt = document.getElementById('ms-progress-txt');
+  if (fill) fill.style.width = `${pct}%`;
+  if (txt) txt.textContent = `${done}/${total}`;
+}
+
+// ──────────────────────────────────
+// Vaccines
+// ──────────────────────────────────
+function renderVaccines() {
+  const child = activeChild();
+  const el = document.getElementById('vaccine-list');
+  if (!child) { el.innerHTML = ''; return; }
+
+  const teiki = VACCINES.filter(v => v.type === '定期');
+  const ninni = VACCINES.filter(v => v.type === '任意');
+
+  el.innerHTML = `
+    <div style="font-weight:700;color:var(--text);margin-bottom:.875rem">定期接種</div>
+    ${teiki.map(v => vaxHtml(v, child)).join('')}
+    <div style="font-weight:700;color:var(--text);margin:1.5rem 0 .875rem">任意接種</div>
+    ${ninni.map(v => vaxHtml(v, child)).join('')}
+  `;
+}
+
+function vaxHtml(v, child) {
+  const date = child.vaccines[v.id] || '';
+  return `
+    <div class="vax-item ${date ? 'done' : ''}">
+      <span class="vax-badge badge-${v.type === '定期' ? 'teiki' : 'ninni'}">${v.type}接種</span>
+      <div class="vax-info">
+        <div class="vax-name">${v.name}</div>
+        <div class="vax-timing">${v.timing}</div>
+      </div>
+      ${date ? '<span style="color:var(--success);font-size:1.25rem">✅</span>' : ''}
+      <input type="date" class="vax-date" value="${date}" onchange="saveVaccine('${v.id}',this.value)" title="接種日を入力">
+    </div>`;
+}
+
+function saveVaccine(id, date) {
+  const child = activeChild();
+  if (!child) return;
+  try {
+    if (date) { child.vaccines[id] = date; toast('ok', '接種日を記録しました'); }
+    else { delete child.vaccines[id]; }
+    saveState();
+    renderVaccines();
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] saveVaccine:', e);
+  }
+}
+
+// ──────────────────────────────────
+// Memories
+// ──────────────────────────────────
+function pickEmoji(el, emoji) {
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selEmoji = emoji;
+  document.getElementById('sel-emoji').textContent = emoji;
+}
+
+function addMemory() {
+  const child = activeChild();
+  if (!child) { toast('err', 'お子さまを選択してください'); return; }
+  const text = document.getElementById('mem-input').value.trim();
+  if (!text) { toast('err', '内容を入力してください'); return; }
+
+  try {
+    const now = new Date();
+    child.memories.unshift({
+      id: Date.now().toString(),
+      date: now.toLocaleString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
+      emoji: selEmoji || '📔',
+      text,
+    });
+    saveState();
+    document.getElementById('mem-input').value = '';
+    document.getElementById('sel-emoji').textContent = '';
+    selEmoji = '';
+    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+    renderMemories();
+    toast('ok', '思い出を記録しました！');
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] addMemory:', e);
+  }
+}
+
+function deleteMemory(id) {
+  const child = activeChild();
+  if (!child) return;
+  try {
+    child.memories = child.memories.filter(m => m.id !== id);
+    saveState();
+    renderMemories();
+    toast('ok', '削除しました');
+  } catch(e) {
+    toast('err', '削除エラーが発生しました');
+    console.error('[KidsGrowth] deleteMemory:', e);
+  }
+}
+
+// ──────────────────────────────────
+// Render functions
+// ──────────────────────────────────
+function renderHero() {
+  const child = activeChild();
+  if (!child) return;
+  document.getElementById('hero-name').textContent = child.name;
+  document.getElementById('hero-age').textContent = child.birth ? `${child.birth} 生まれ・${calcAge(child.birth)}` : '';
+
+  const records = child.records;
+  const lastH = records.filter(r => r.h !== null).slice(-1)[0];
+  const lastW = records.filter(r => r.w !== null).slice(-1)[0];
+  document.getElementById('stat-height').textContent = lastH ? lastH.h : '--';
+  document.getElementById('stat-weight').textContent = lastW ? lastW.w : '--';
+  document.getElementById('stat-count').textContent = records.length;
+  renderMsProgress();
+}
+
+function renderGrowth() {
+  const child = activeChild();
+  const el = document.getElementById('records-table');
+  if (!child || child.records.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><div class="empty-title">まだ記録がありません</div><div class="empty-desc">上のフォームから身長・体重を記録しましょう</div></div>`;
+  } else {
+    const rows = [...child.records].reverse().map(r => `
+      <tr>
+        <td>${r.date}</td>
+        <td>${r.h !== null ? r.h + ' cm' : '—'}</td>
+        <td>${r.w !== null ? r.w + ' kg' : '—'}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">削除</button></td>
+      </tr>`).join('');
+    el.innerHTML = `<table class="data-table"><thead><tr><th>日付</th><th>身長</th><th>体重</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  renderChart();
+}
+
+function renderMemories() {
+  const child = activeChild();
+  const el = document.getElementById('memory-list');
+  if (!child || child.memories.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📔</div><div class="empty-title">思い出がまだありません</div><div class="empty-desc">上のフォームから記録しましょう</div></div>`;
+    return;
+  }
+  el.innerHTML = child.memories.map(m => `
+    <div class="mem-card">
+      <div class="mem-date">${m.date}</div>
+      <div class="mem-text"><span class="mem-emoji">${m.emoji}</span>${m.text}</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:.875rem">
+        <button class="btn btn-danger btn-sm" onclick="deleteMemory('${m.id}')">削除</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderChildSelector() {
+  const el = document.getElementById('child-selector');
+  if (state.children.length === 0) {
+    el.innerHTML = '<span style="font-size:.8125rem;color:var(--muted)">お子さまを追加してください</span>';
+    return;
+  }
+  el.innerHTML = state.children.map(c => `
+    <button class="child-pill ${c.id === state.activeId ? 'active' : ''}" onclick="selectChild('${c.id}')">
+      ${c.gender === 'male' ? '👦' : c.gender === 'female' ? '👧' : '🧒'} ${c.name}
+    </button>`).join('');
+}
+
+function renderFaq() {
+  document.getElementById('faq-list').innerHTML = FAQS.map((f, i) => `
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false" onclick="toggleFaq(${i},this)">
+        ${f[0]}
+        <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-a" id="faq-a-${i}">${f[1]}</div>
+    </div>`).join('');
+}
+
+function toggleFaq(i, btn) {
+  const el = document.getElementById(`faq-a-${i}`);
+  const open = el.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open);
+}
+
+// ──────────────────────────────────
+// Tabs & Modals
+// ──────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  document.getElementById(`panel-${name}`).classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// ──────────────────────────────────
+// Toast
+// ──────────────────────────────────
+function toast(type, msg) {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type === 'ok' ? 'ok' : 'err'}`;
+  el.textContent = (type === 'ok' ? '✅ ' : '❌ ') + msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ──────────────────────────────────
+// Global error handler
+// ──────────────────────────────────
+window.onerror = (msg, src, line) => {
+  console.error(`[KidsGrowth] ${msg} @ ${src}:${line}`);
+  return false;
+};
+
+// ──────────────────────────────────
+// Render all
+// ──────────────────────────────────
+function renderAll() {
+  const has = state.children.length > 0;
+  document.getElementById('view-empty').style.display = has ? 'none' : 'block';
+  document.getElementById('view-dashboard').style.display = has ? 'block' : 'none';
+  renderChildSelector();
+  if (has && state.activeId) {
+    renderHero();
+    renderGrowth();
+    renderMilestones();
+    renderVaccines();
+    renderMemories();
+  }
+}
+
+// ──────────────────────────────────
+// Init
+// ──────────────────────────────────
+function init() {
+  document.getElementById('r-date').value = new Date().toISOString().slice(0, 10);
+  loadState();
+  if (state.children.length > 0 && !state.activeId) {
+    state.activeId = state.children[0].id;
+  }
+  renderFaq();
+  renderAll();
+}
+
+init();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"身長や体重の記録はどこに保存されますか？","acceptedAnswer":{"@type":"Answer","text":"すべてのデータはお使いのブラウザのLocalStorageに保存されます。サーバーには送信されません。"}},
+    {"@type":"Question","name":"複数の子どもを登録できますか？","acceptedAnswer":{"@type":"Answer","text":"はい、何人でも登録できます。ヘッダーから切り替え可能です。"}},
+    {"@type":"Question","name":"発達マイルストーンとは何ですか？","acceptedAnswer":{"@type":"Answer","text":"赤ちゃんの発達の節目となる動作です。首すわり・寝返りなど13項目を管理できます。"}},
+    {"@type":"Question","name":"スマートフォンでも使えますか？","acceptedAnswer":{"@type":"Answer","text":"はい、モバイル対応しています。ホーム画面に追加することでアプリのように使えます。"}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"ホーム","item":"https://appadaycreator.github.io/"},
+    {"@type":"ListItem","position":2,"name":"子どもの成長記録ダッシュボード","item":"https://appadaycreator.github.io/kids-growth-tracker/"}
+  ]
+}
+</script>
+</body>
+</html>
