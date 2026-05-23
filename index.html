@@ -270,7 +270,15 @@
       .main{padding:1.25rem 1rem}
       .tab-content{padding:1.25rem}
     }
-  </style>
+  
+/* Phase 8: Mobile Optimization */
+input, select, textarea { font-size: 16px !important; }
+button, .btn, .btn-primary, .option-btn, [role="button"] { min-height: 48px; min-width: 48px; touch-action: manipulation; }
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .max-w-lg { padding-left: 1rem; padding-right: 1rem; }
+}
+</style>
 <meta name="google-site-verification" content="4uF0qY3J4NKAaGgcq1fGsunrHfe483IlwmmeFLn5V3E">
 <script type="application/ld+json">
 {
