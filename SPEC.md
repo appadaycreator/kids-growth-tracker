@@ -3,8 +3,8 @@
 ## 概要
 
 **サービス名**: Kids Growth Tracker
-**バージョン**: 1.1.0
-**更新日**: 2026-05-28
+**バージョン**: 1.3.0
+**更新日**: 2026-05-29
 **URL**: https://appadaycreator.com/kids-growth-tracker/
 
 お子さまの身長・体重・発達マイルストーン・予防接種を一元管理。成長グラフで発育の推移を可視化する無料の子ども成長記録アプリです。複数のお子さまに対応、データは端末内のみに保存。
@@ -69,6 +69,12 @@
 GitHub Pages（mainブランチ push → 自動デプロイ）
 
 ## 変更履歴
+
+### v1.3.0 (2026-05-29)
+- 重複 `window.onerror` ハンドラ削除（IIFE内の重複を除去し元のハンドラを有効化）
+- 重複 `.loading-overlay` CSS 統合（`flex-direction:column` 追加・z-index:9998 に統一）
+- phase8/9 注入セクションのTailwindクラスをインラインスタイルに変換（`.space-y-3`, `.bg-gray-50`, `.text-indigo-600` 等）
+- 不正な `aria-label` 削除（`r-height`, `r-weight` 入力フォーム）
 
 ### v1.2.0 (2026-05-28)
 - 横展開注入セクションの `.toast` クラス競合を `.gd-toast` にリネームして解消
