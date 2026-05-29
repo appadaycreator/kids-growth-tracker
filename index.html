@@ -79,6 +79,15 @@
     .child-pill.active{background:var(--primary);color:#fff}
     .add-child-btn{width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
     .add-child-btn:hover{background:var(--primary-light);transform:scale(1.1)}
+    .settings-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
+    .settings-btn:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary-border)}
+    .child-pill-edit{width:20px;height:20px;border-radius:50%;border:none;background:rgba(255,255,255,.3);color:inherit;cursor:pointer;font-size:.7rem;display:inline-flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0;padding:0;margin-left:.125rem}
+    .child-pill-edit:hover{background:rgba(255,255,255,.5)}
+    .child-pill.active .child-pill-edit{color:#fff}
+    /* 差分バッジ */
+    .stat-diff{font-size:.6875rem;opacity:.8;margin-top:.25rem;font-weight:600}
+    .stat-diff.up{color:rgba(255,255,255,.9)}
+    .stat-diff.down{color:rgba(255,220,220,.9)}
 
     /* ── Main ────────────────────── */
     .main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
@@ -248,6 +257,10 @@
     .footer-links a:hover{color:var(--primary)}
     .footer-copy{font-size:.75rem;color:var(--muted)}
 
+    /* ── Confirm modal ──────────── */
+    .confirm-modal .modal-body{font-size:.9375rem;color:var(--body);margin-bottom:1.5rem;line-height:1.75}
+    /* ── Chart responsive ────────── */
+    #chart-svg{width:100%;height:auto}
     /* ── Responsive ──────────────── */
     @media(max-width:768px){
       .hero-stats{grid-template-columns:1fr 1fr}
@@ -353,6 +366,68 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
   </div>
 </div>
 
+<!-- Modal: Edit child -->
+<div class="overlay" id="modal-edit-child">
+  <div class="modal">
+    <div class="modal-title">✏️ お子さまの情報を編集</div>
+    <input type="hidden" id="edit-child-id">
+    <div class="form-group">
+      <label class="form-label">お名前</label>
+      <input type="text" id="edit-child-name" class="form-input" placeholder="例: たろう" maxlength="20" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">生年月日</label>
+      <input type="date" id="edit-child-birth" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">性別</label>
+      <select id="edit-child-gender" class="form-input">
+        <option value="">未回答</option>
+        <option value="male">男の子</option>
+        <option value="female">女の子</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" onclick="deleteChildConfirm()">このお子さまを削除</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-child')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEditChild()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirm -->
+<div class="overlay" id="modal-confirm">
+  <div class="modal confirm-modal" style="max-width:380px">
+    <div class="modal-title" id="confirm-title">確認</div>
+    <div class="modal-body" id="confirm-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">キャンセル</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Settings / Export-Import -->
+<div class="overlay" id="modal-settings">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">⚙️ データ管理</div>
+    <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.75">データはすべてこの端末のブラウザ内に保存されています。端末変更・ブラウザ変更の前にエクスポートしてバックアップを取ってください。</p>
+    <div style="display:flex;flex-direction:column;gap:.875rem">
+      <button class="btn btn-primary" onclick="exportData()" style="width:100%">
+        📥 全データをエクスポート（JSON）
+      </button>
+      <label class="btn btn-secondary" style="width:100%;justify-content:center;cursor:pointer">
+        📤 JSONファイルからインポート
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+      </label>
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:1rem">※インポートすると現在のデータと結合されます（上書きではなく追加）</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-settings')">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Milestone -->
 <div class="overlay" id="modal-milestone">
   <div class="modal">
@@ -383,6 +458,7 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
     <div class="hdivider"></div>
     <div class="child-selector" id="child-selector"></div>
     <button class="add-child-btn" onclick="openModal('modal-add-child')" title="お子さまを追加">＋</button>
+    <button class="settings-btn" onclick="openModal('modal-settings')" title="データ管理・設定">⚙️</button>
   </div>
 </header>
 
@@ -410,10 +486,12 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
           <div class="hero-stat">
             <div class="hero-stat-label">最新の身長</div>
             <div class="hero-stat-value"><span id="stat-height">--</span><span class="hero-stat-unit">cm</span></div>
+            <div class="stat-diff" id="stat-height-diff"></div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-label">最新の体重</div>
             <div class="hero-stat-value"><span id="stat-weight">--</span><span class="hero-stat-unit">kg</span></div>
+            <div class="stat-diff" id="stat-weight-diff"></div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-label">記録回数</div>
@@ -457,6 +535,10 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>追加
               </button>
             </div>
+            <div class="form-group" style="margin:.875rem 0 0">
+              <label class="form-label">メモ（任意）</label>
+              <input type="text" id="r-memo" class="form-input" placeholder="例: 離乳食開始、1ヶ月健診など" maxlength="60">
+            </div>
           </div>
 
           <div class="card" style="margin-bottom:1.5rem">
@@ -466,7 +548,7 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
               <button class="chart-tab" id="ctab-weight" onclick="switchChart('weight')">体重</button>
             </div>
             <div class="chart-wrap">
-              <svg id="chart-svg" width="660" height="220" viewBox="0 0 660 220">
+              <svg id="chart-svg" viewBox="0 0 660 220" preserveAspectRatio="xMidYMid meet">
                 <text x="330" y="115" text-anchor="middle" fill="#9ca3af" font-size="14" font-family="sans-serif">データがありません</text>
               </svg>
             </div>
@@ -773,10 +855,115 @@ function addChild() {
   }
 }
 
+function openEditChild(id) {
+  const child = state.children.find(c => c.id === id);
+  if (!child) return;
+  document.getElementById('edit-child-id').value = id;
+  document.getElementById('edit-child-name').value = child.name;
+  document.getElementById('edit-child-birth').value = child.birth;
+  document.getElementById('edit-child-gender').value = child.gender || '';
+  openModal('modal-edit-child');
+}
+
+function saveEditChild() {
+  const id = document.getElementById('edit-child-id').value;
+  const name = document.getElementById('edit-child-name').value.trim();
+  const birth = document.getElementById('edit-child-birth').value;
+  const gender = document.getElementById('edit-child-gender').value;
+  if (!name) { toast('err', 'お名前を入力してください'); return; }
+  if (!birth) { toast('err', '生年月日を入力してください'); return; }
+  const child = state.children.find(c => c.id === id);
+  if (!child) return;
+  child.name = name; child.birth = birth; child.gender = gender;
+  saveState();
+  closeModal('modal-edit-child');
+  renderAll();
+  toast('ok', '情報を更新しました');
+}
+
+function deleteChildConfirm() {
+  const id = document.getElementById('edit-child-id').value;
+  const child = state.children.find(c => c.id === id);
+  if (!child) return;
+  showConfirm(
+    `「${child.name}」を削除しますか？`,
+    'この操作は取り消せません。記録・マイルストーン・思い出すべてが削除されます。',
+    () => {
+      state.children = state.children.filter(c => c.id !== id);
+      if (state.activeId === id) state.activeId = state.children[0]?.id || null;
+      saveState();
+      closeModal('modal-edit-child');
+      renderAll();
+      toast('ok', '削除しました');
+    }
+  );
+}
+
 function selectChild(id) {
   state.activeId = id;
   saveState();
   renderAll();
+}
+
+// 確認ダイアログ
+let _confirmCallback = null;
+function showConfirm(title, body, onOk) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').textContent = body;
+  _confirmCallback = onOk;
+  openModal('modal-confirm');
+}
+function _initConfirm() {
+  document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+    closeModal('modal-confirm');
+    if (_confirmCallback) { _confirmCallback(); _confirmCallback = null; }
+  });
+}
+
+// データエクスポート
+function exportData() {
+  try {
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url; a.download = `kidsgrowth-backup-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('ok', 'エクスポートしました');
+  } catch(e) {
+    toast('err', 'エクスポートに失敗しました');
+    console.error('[KidsGrowth] export:', e);
+  }
+}
+
+// データインポート
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.children || !Array.isArray(imported.children)) throw new Error('invalid format');
+      const existingIds = new Set(state.children.map(c => c.id));
+      let added = 0;
+      imported.children.forEach(c => {
+        if (!existingIds.has(c.id)) { state.children.push(c); added++; }
+      });
+      if (state.children.length > 0 && !state.activeId) state.activeId = state.children[0].id;
+      saveState();
+      renderAll();
+      closeModal('modal-settings');
+      toast('ok', `インポート完了（${added}人追加）`);
+    } catch(err) {
+      toast('err', '読み込みに失敗しました。正しいJSONファイルを選択してください');
+      console.error('[KidsGrowth] import:', err);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function calcAge(birth) {
@@ -809,12 +996,14 @@ function addRecord() {
   if (hRaw !== '' && (isNaN(h) || h < 30 || h > 250)) { toast('err', '身長の値が正しくありません（30〜250cm）'); return; }
   if (wRaw !== '' && (isNaN(w) || w < 0.5 || w > 300)) { toast('err', '体重の値が正しくありません（0.5〜300kg）'); return; }
 
+  const memo = document.getElementById('r-memo').value.trim();
   try {
-    child.records.push({ id: Date.now().toString(), date, h: hRaw !== '' ? h : null, w: wRaw !== '' ? w : null });
+    child.records.push({ id: Date.now().toString(), date, h: hRaw !== '' ? h : null, w: wRaw !== '' ? w : null, memo: memo || '' });
     child.records.sort((a, b) => a.date.localeCompare(b.date));
     saveState();
     document.getElementById('r-height').value = '';
     document.getElementById('r-weight').value = '';
+    document.getElementById('r-memo').value = '';
     renderGrowth();
     renderHero();
     toast('ok', '記録を追加しました！');
@@ -827,16 +1016,23 @@ function addRecord() {
 function deleteRecord(id) {
   const child = activeChild();
   if (!child) return;
-  try {
-    child.records = child.records.filter(r => r.id !== id);
-    saveState();
-    renderGrowth();
-    renderHero();
-    toast('ok', '記録を削除しました');
-  } catch(e) {
-    toast('err', '削除エラーが発生しました');
-    console.error('[KidsGrowth] deleteRecord:', e);
-  }
+  const rec = child.records.find(r => r.id === id);
+  showConfirm(
+    '記録を削除しますか？',
+    `${rec ? rec.date + ' の記録' : 'この記録'}を削除します。この操作は取り消せません。`,
+    () => {
+      try {
+        child.records = child.records.filter(r => r.id !== id);
+        saveState();
+        renderGrowth();
+        renderHero();
+        toast('ok', '記録を削除しました');
+      } catch(e) {
+        toast('err', '削除エラーが発生しました');
+        console.error('[KidsGrowth] deleteRecord:', e);
+      }
+    }
+  );
 }
 
 // ──────────────────────────────────
@@ -1089,15 +1285,17 @@ function addMemory() {
 function deleteMemory(id) {
   const child = activeChild();
   if (!child) return;
-  try {
-    child.memories = child.memories.filter(m => m.id !== id);
-    saveState();
-    renderMemories();
-    toast('ok', '削除しました');
-  } catch(e) {
-    toast('err', '削除エラーが発生しました');
-    console.error('[KidsGrowth] deleteMemory:', e);
-  }
+  showConfirm('思い出を削除しますか？', 'この操作は取り消せません。', () => {
+    try {
+      child.memories = child.memories.filter(m => m.id !== id);
+      saveState();
+      renderMemories();
+      toast('ok', '削除しました');
+    } catch(e) {
+      toast('err', '削除エラーが発生しました');
+      console.error('[KidsGrowth] deleteMemory:', e);
+    }
+  });
 }
 
 // ──────────────────────────────────
@@ -1110,11 +1308,33 @@ function renderHero() {
   document.getElementById('hero-age').textContent = child.birth ? `${child.birth} 生まれ・${calcAge(child.birth)}` : '';
 
   const records = child.records;
-  const lastH = records.filter(r => r.h !== null).slice(-1)[0];
-  const lastW = records.filter(r => r.w !== null).slice(-1)[0];
+  const hRecs = records.filter(r => r.h !== null);
+  const wRecs = records.filter(r => r.w !== null);
+  const lastH = hRecs.slice(-1)[0];
+  const prevH = hRecs.slice(-2, -1)[0];
+  const lastW = wRecs.slice(-1)[0];
+  const prevW = wRecs.slice(-2, -1)[0];
+
   document.getElementById('stat-height').textContent = lastH ? lastH.h : '--';
   document.getElementById('stat-weight').textContent = lastW ? lastW.w : '--';
   document.getElementById('stat-count').textContent = records.length;
+
+  const hDiffEl = document.getElementById('stat-height-diff');
+  if (hDiffEl) {
+    if (lastH && prevH) {
+      const d = (lastH.h - prevH.h).toFixed(1);
+      hDiffEl.textContent = (d >= 0 ? '+' : '') + d + 'cm（前回比）';
+      hDiffEl.className = 'stat-diff ' + (d >= 0 ? 'up' : 'down');
+    } else { hDiffEl.textContent = ''; }
+  }
+  const wDiffEl = document.getElementById('stat-weight-diff');
+  if (wDiffEl) {
+    if (lastW && prevW) {
+      const d = (lastW.w - prevW.w).toFixed(2);
+      wDiffEl.textContent = (d >= 0 ? '+' : '') + d + 'kg（前回比）';
+      wDiffEl.className = 'stat-diff ' + (d >= 0 ? 'up' : 'down');
+    } else { wDiffEl.textContent = ''; }
+  }
   renderMsProgress();
 }
 
@@ -1129,9 +1349,10 @@ function renderGrowth() {
         <td>${r.date}</td>
         <td>${r.h !== null ? r.h + ' cm' : '—'}</td>
         <td>${r.w !== null ? r.w + ' kg' : '—'}</td>
+        <td style="color:var(--muted);font-size:.8125rem">${r.memo || ''}</td>
         <td><button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">削除</button></td>
       </tr>`).join('');
-    el.innerHTML = `<table class="data-table"><thead><tr><th>日付</th><th>身長</th><th>体重</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    el.innerHTML = `<table class="data-table"><thead><tr><th>日付</th><th>身長</th><th>体重</th><th>メモ</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
   }
   renderChart();
 }
@@ -1160,9 +1381,12 @@ function renderChildSelector() {
     return;
   }
   el.innerHTML = state.children.map(c => `
-    <button class="child-pill ${c.id === state.activeId ? 'active' : ''}" onclick="selectChild('${c.id}')">
-      ${c.gender === 'male' ? '👦' : c.gender === 'female' ? '👧' : '🧒'} ${c.name}
-    </button>`).join('');
+    <span class="child-pill ${c.id === state.activeId ? 'active' : ''}">
+      <button style="background:none;border:none;cursor:pointer;color:inherit;font:inherit;padding:0;display:inline-flex;align-items:center;gap:.25rem" onclick="selectChild('${c.id}')">
+        ${c.gender === 'male' ? '👦' : c.gender === 'female' ? '👧' : '🧒'} ${c.name}
+      </button>
+      <button class="child-pill-edit" onclick="openEditChild('${c.id}')" title="編集">✏️</button>
+    </span>`).join('');
 }
 
 function renderFaq() {
@@ -1245,6 +1469,7 @@ function init() {
   if (state.children.length > 0 && !state.activeId) {
     state.activeId = state.children[0].id;
   }
+  _initConfirm();
   renderFaq();
   renderAll();
 }
@@ -1325,16 +1550,16 @@ init();
       <h3 style="font-size:.875rem;font-weight:700;color:var(--text);margin-bottom:.75rem">⭐ 利用者の声</h3>
       <div style="display:flex;flex-direction:column;gap:.75rem">
         <div style="background:#f9fafb;border-radius:8px;padding:.75rem">
-          <p style="font-size:.75rem;color:var(--body)">「すぐに結果が出て使いやすかったです。友人にも勧めました！」</p>
-          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 田中さん（30代・会社員）★★★★★</p>
+          <p style="font-size:.75rem;color:var(--body)">「歩き始めた日やはじめて言葉を話した瞬間を記録できて感動！グラフで成長が一目でわかります。」</p>
+          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 田中さん（30代・2児のパパ）★★★★★</p>
         </div>
         <div style="background:#f9fafb;border-radius:8px;padding:.75rem">
-          <p style="font-size:.75rem;color:var(--body)">「無料でここまで詳しく診断できるとは思いませんでした。」</p>
-          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 佐藤さん（40代・主婦）★★★★★</p>
+          <p style="font-size:.75rem;color:var(--body)">「予防接種の管理がとても便利。打ち忘れが防げてひと安心。複数の子どもを登録できるのも助かります。」</p>
+          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 佐藤さん（30代・3歳と5歳のママ）★★★★★</p>
         </div>
         <div style="background:#f9fafb;border-radius:8px;padding:.75rem">
-          <p style="font-size:.75rem;color:var(--body)">「登録不要でサクッと使えるのが良いです。また利用します。」</p>
-          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 山本さん（20代・学生）★★★★☆</p>
+          <p style="font-size:.75rem;color:var(--body)">「登録不要でデータが端末に残るので安心。1歳健診の前に成長記録をまとめて入力しました！」</p>
+          <p style="font-size:.75rem;color:var(--muted);margin-top:.25rem">— 山本さん（20代・初めての育児中）★★★★☆</p>
         </div>
       </div>
       <div style="display:flex;gap:.5rem;margin-top:1rem">
