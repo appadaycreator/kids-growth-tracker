@@ -297,6 +297,43 @@ button, .btn, .btn-primary, .option-btn, [role="button"] { min-height: 48px; min
   a[href]::after{content:none!important}
 }
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+
+/* ── カウプ指数バッジ ─────── */
+.kaup-badge{display:inline-block;padding:.2rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;margin-top:.375rem;letter-spacing:0}
+.kaup-normal{background:rgba(16,185,129,.25);color:#065f46}
+.kaup-thin{background:rgba(245,158,11,.25);color:#92400e}
+.kaup-fat{background:rgba(239,68,68,.25);color:#991b1b}
+
+/* ── グラフツールチップ ────── */
+.chart-wrap{position:relative}
+.chart-tooltip{position:absolute;background:rgba(30,27,75,.92);color:#fff;padding:.4rem .8rem;border-radius:var(--radius-sm);font-size:.75rem;font-weight:600;pointer-events:none;opacity:0;transition:opacity .15s;white-space:nowrap;z-index:10;transform:translate(-50%,-110%)}
+.chart-dot{cursor:pointer;transition:r .12s}
+
+/* ── 予防接種ステータスバッジ ── */
+.vax-soon{background:#fef3c7;color:#92400e;padding:.2rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;flex-shrink:0}
+.vax-overdue{background:#fee2e2;color:#991b1b;padding:.2rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;flex-shrink:0}
+.vax-upcoming{background:#dbeafe;color:#1d4ed8;padding:.2rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700;flex-shrink:0}
+
+/* ── 乳幼児健診 ─────────── */
+.checkup-item{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.25rem;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:.5rem;background:#fff;flex-wrap:wrap;transition:var(--ease)}
+.checkup-item.done{border-color:var(--success);background:#f0fdf4}
+.checkup-item.upcoming{border-color:#fbbf24;background:#fffbeb}
+.checkup-name{font-weight:700;color:var(--text);font-size:.9375rem}
+.checkup-timing{font-size:.8125rem;color:var(--muted)}
+.checkup-date-input{padding:.375rem .75rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.8125rem;font-family:var(--font);width:150px;transition:var(--ease);flex-shrink:0}
+.checkup-date-input:focus{outline:none;border-color:var(--primary)}
+
+/* ── モバイル改善 ─────────── */
+@media(max-width:480px){
+  .vax-date{width:auto;min-width:120px;flex-shrink:0}
+  .vax-item{flex-wrap:wrap}
+  .data-table{display:block}
+  .data-table thead{display:none}
+  .data-table tbody,.data-table tr,.data-table td{display:block;width:100%}
+  .data-table tr{border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:.625rem;padding:.375rem .625rem}
+  .data-table td{border-bottom:none;padding:.25rem .375rem;font-size:.8125rem}
+  .data-table td::before{content:attr(data-label);font-weight:700;font-size:.75rem;color:var(--muted);display:block}
+}
 </style>
 <meta name="google-site-verification" content="4uF0qY3J4NKAaGgcq1fGsunrHfe483IlwmmeFLn5V3E">
 <script type="application/ld+json">
@@ -409,10 +446,39 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
   </div>
 </div>
 
+<!-- Modal: Edit record -->
+<div class="overlay" id="modal-edit-record">
+  <div class="modal">
+    <div class="modal-title">✏️ 記録を編集</div>
+    <input type="hidden" id="edit-record-id">
+    <div class="form-group">
+      <label class="form-label">日付</label>
+      <input type="date" id="edit-rec-date" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">身長（cm）</label>
+      <input type="number" id="edit-rec-height" class="form-input" placeholder="65.0" step="0.1" min="30" max="250">
+    </div>
+    <div class="form-group">
+      <label class="form-label">体重（kg）</label>
+      <input type="number" id="edit-rec-weight" class="form-input" placeholder="7.5" step="0.01" min="0.5" max="300">
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ（任意）</label>
+      <input type="text" id="edit-rec-memo" class="form-input" maxlength="60">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-record')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEditRecord()">保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Settings / Export-Import -->
 <div class="overlay" id="modal-settings">
   <div class="modal" style="max-width:420px">
     <div class="modal-title">⚙️ データ管理</div>
+    <div id="data-stats" style="margin-bottom:1rem"></div>
     <p style="font-size:.875rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.75">データはすべてこの端末のブラウザ内に保存されています。端末変更・ブラウザ変更の前にエクスポートしてバックアップを取ってください。</p>
     <div style="display:flex;flex-direction:column;gap:.875rem">
       <button class="btn btn-primary" onclick="exportData()" style="width:100%">
@@ -496,8 +562,9 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
             <div class="stat-diff" id="stat-weight-diff"></div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-label">記録回数</div>
-            <div class="hero-stat-value" id="stat-count">0</div>
+            <div class="hero-stat-label">カウプ指数</div>
+            <div class="hero-stat-value" id="stat-kaup">--</div>
+            <div class="stat-diff" id="stat-kaup-eval" style="font-size:.65rem;opacity:.85"></div>
           </div>
         </div>
         <div class="progress-label"><span>発達マイルストーン達成率</span><span id="ms-progress-txt">0/13</span></div>
@@ -553,6 +620,7 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
               <svg id="chart-svg" viewBox="0 0 660 220" preserveAspectRatio="xMidYMid meet">
                 <text x="330" y="115" text-anchor="middle" fill="#9ca3af" font-size="14" font-family="sans-serif">データがありません</text>
               </svg>
+              <div class="chart-tooltip" id="chart-tooltip"></div>
             </div>
           </div>
 
@@ -569,6 +637,8 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
 
         <!-- Vaccine -->
         <div class="tab-panel" id="panel-vaccine">
+          <div id="checkup-section" style="margin-bottom:1.75rem"></div>
+          <div id="vaccine-summary" style="margin-bottom:.875rem"></div>
           <p style="font-size:.8125rem;color:var(--muted);margin-bottom:1.25rem">💡 接種日を入力すると完了マークが付きます。母子手帳と照らし合わせながら記録しましょう。</p>
           <div id="vaccine-list"></div>
         </div>
@@ -576,7 +646,11 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
         <!-- Memory -->
         <div class="tab-panel" id="panel-memory">
           <div class="memory-form">
-            <div class="card-title" style="margin-bottom:1rem">📔 今日の思い出を記録</div>
+            <div class="card-title" style="margin-bottom:1rem">📔 思い出を記録</div>
+            <div class="form-group" style="margin-bottom:.875rem">
+              <label class="form-label">記録日</label>
+              <input type="date" id="mem-date" class="form-input" style="max-width:200px">
+            </div>
             <div class="emoji-row" id="emoji-row">
               <span class="emoji-btn" onclick="pickEmoji(this,'🎉')">🎉 初めて</span>
               <span class="emoji-btn" onclick="pickEmoji(this,'😊')">😊 笑顔</span>
@@ -585,7 +659,7 @@ select,input[type=text],input[type=number],input[type=email],textarea{min-height
               <span class="emoji-btn" onclick="pickEmoji(this,'😴')">😴 ねんね</span>
               <span class="emoji-btn" onclick="pickEmoji(this,'🏥')">🏥 病院</span>
             </div>
-            <textarea id="mem-input" class="mem-textarea" placeholder="今日の出来事や気づきを書き留めましょう..."></textarea>
+            <textarea id="mem-input" class="mem-textarea" placeholder="出来事や気づきを書き留めましょう（過去の日付も記録できます）..."></textarea>
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:.875rem;margin-top:.875rem">
               <span id="sel-emoji" style="font-size:1.5rem"></span>
               <button class="btn btn-primary" onclick="addMemory()">記録する</button>
@@ -773,24 +847,34 @@ const MILESTONES = [
 ];
 
 const VACCINES = [
-  { id:'vax1', name:'ヒブ（Hib）感染症', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期' },
-  { id:'vax2', name:'小児用肺炎球菌', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期' },
-  { id:'vax3', name:'B型肝炎', timing:'2・3・7〜8ヶ月', type:'定期' },
-  { id:'vax4', name:'ロタウイルス', timing:'2・3（・4）ヶ月', type:'定期' },
-  { id:'vax5', name:'四種混合（DPT-IPV）', timing:'3・4・5ヶ月、18ヶ月', type:'定期' },
-  { id:'vax6', name:'BCG（結核）', timing:'5〜8ヶ月', type:'定期' },
-  { id:'vax7', name:'MR（麻疹・風疹）', timing:'1歳・就学前', type:'定期' },
-  { id:'vax8', name:'水痘（みずぼうそう）', timing:'1歳・1.5歳', type:'定期' },
-  { id:'vax9', name:'日本脳炎', timing:'3歳・4歳・9歳', type:'定期' },
-  { id:'vax10', name:'おたふくかぜ', timing:'1歳・就学前', type:'任意' },
-  { id:'vax11', name:'インフルエンザ', timing:'毎年秋（6ヶ月〜）', type:'任意' },
+  { id:'vax1', name:'ヒブ（Hib）感染症', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期', months:[2,3,4,13] },
+  { id:'vax2', name:'小児用肺炎球菌', timing:'2・3・4ヶ月、12〜15ヶ月', type:'定期', months:[2,3,4,13] },
+  { id:'vax3', name:'B型肝炎', timing:'2・3・7〜8ヶ月', type:'定期', months:[2,3,7] },
+  { id:'vax4', name:'ロタウイルス', timing:'2・3（・4）ヶ月', type:'定期', months:[2,3] },
+  { id:'vax5', name:'四種混合（DPT-IPV）', timing:'3・4・5ヶ月、18ヶ月', type:'定期', months:[3,4,5,18] },
+  { id:'vax6', name:'BCG（結核）', timing:'5〜8ヶ月', type:'定期', months:[6] },
+  { id:'vax7', name:'MR（麻疹・風疹）', timing:'1歳・就学前', type:'定期', months:[12] },
+  { id:'vax8', name:'水痘（みずぼうそう）', timing:'1歳・1.5歳', type:'定期', months:[12,18] },
+  { id:'vax9', name:'日本脳炎', timing:'3歳・4歳・9歳', type:'定期', months:[36] },
+  { id:'vax10', name:'おたふくかぜ', timing:'1歳・就学前', type:'任意', months:[12] },
+  { id:'vax11', name:'インフルエンザ', timing:'毎年秋（6ヶ月〜）', type:'任意', months:[6] },
+];
+
+const CHECKUPS = [
+  { id:'cu1', name:'1ヶ月健診', months:1, icon:'👶' },
+  { id:'cu2', name:'3〜4ヶ月健診', months:3.5, icon:'😊' },
+  { id:'cu3', name:'6〜7ヶ月健診', months:6.5, icon:'🧸' },
+  { id:'cu4', name:'9〜10ヶ月健診', months:9.5, icon:'🏃' },
+  { id:'cu5', name:'1歳健診', months:12, icon:'🎂' },
+  { id:'cu6', name:'1歳6ヶ月健診', months:18, icon:'🌱' },
+  { id:'cu7', name:'3歳健診', months:36, icon:'⭐' },
 ];
 
 const FAQS = [
   ['身長や体重の記録はどこに保存されますか？', 'すべてのデータはお使いのブラウザのLocalStorageに保存されます。サーバーには一切送信されず、プライバシーが完全に保護されます。'],
   ['複数の子どもを登録できますか？', 'はい、何人でも登録できます。画面上部のヘッダーからいつでも切り替え可能です。'],
   ['発達マイルストーンとは何ですか？', '赤ちゃん・幼児の発達の節目となる動作・能力のことです。首すわり・寝返りなど運動発達、言語発達、社会性の発達など13項目を管理できます。'],
-  ['データをバックアップする方法はありますか？', 'データはLocalStorageに保存されます。定期的にスクリーンショットを撮るか、母子手帳と併用して記録を残すことをお勧めします。'],
+  ['データをバックアップする方法はありますか？', 'ヘッダーの⚙️ボタン→「データ管理」→「全データをエクスポート（JSON）」でJSONファイルとして保存できます。機種変更・ブラウザ変更の前に必ずエクスポートしてください。インポート機能で別端末にデータを引き継ぐことも可能です。'],
   ['成長グラフはどのように使いますか？', '「成長記録」タブ内に自動的にグラフが表示されます。身長・体重それぞれのボタンで切り替えられます。2件以上のデータを登録すると推移グラフが表示されます。'],
   ['予防接種の管理はどのようにすればいいですか？', '「予防接種」タブで各ワクチンの接種日を入力すると、完了マークが付きます。母子手帳と照らし合わせながら記録しましょう。'],
   ['スマートフォンでも使えますか？', 'はい、モバイル対応しています。ブラウザの「ホーム画面に追加」機能でアプリのように使うこともできます。'],
@@ -842,7 +926,7 @@ function addChild() {
   if (!birth) { toast('err', '生年月日を入力してください'); return; }
 
   try {
-    const child = { id: Date.now().toString(), name, birth, gender, records: [], milestones: {}, vaccines: {}, memories: [] };
+    const child = { id: Date.now().toString(), name, birth, gender, records: [], milestones: {}, vaccines: {}, memories: [], checkups: {} };
     state.children.push(child);
     state.activeId = child.id;
     saveState();
@@ -1088,10 +1172,20 @@ function renderChart() {
     }
   });
 
-  const dots = pts.map((r, i) => `<circle cx="${xS(i)}" cy="${yS(r[key])}" r="5" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/>`).join('');
+  const unit = chartType === 'height' ? 'cm' : 'kg';
+  const dots = pts.map((r, i) => {
+    const cx = xS(i), cy = yS(r[key]);
+    const val = r[key];
+    const info = `${r.date}  ${val}${unit}${r.memo ? '  ' + r.memo : ''}`;
+    const safeInfo = info.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    return `<circle class="chart-dot" cx="${cx}" cy="${cy}" r="5" fill="#fff" stroke="#7c3aed" stroke-width="2.5"
+      onmouseover="showChartTip(event,${cx},${cy},'${safeInfo}')"
+      onmouseleave="hideChartTip()"
+      ontouchstart="showChartTip(event,${cx},${cy},'${safeInfo}')"
+      style="cursor:pointer"/>`;
+  }).join('');
 
   const last = pts[pts.length - 1];
-  const unit = chartType === 'height' ? 'cm' : 'kg';
 
   svg.innerHTML = `
     <defs>
@@ -1206,10 +1300,23 @@ function renderMsProgress() {
 function renderVaccines() {
   const child = activeChild();
   const el = document.getElementById('vaccine-list');
-  if (!child) { el.innerHTML = ''; return; }
+  const summaryEl = document.getElementById('vaccine-summary');
+  if (!child) { el.innerHTML = ''; if (summaryEl) summaryEl.innerHTML = ''; return; }
+
+  renderCheckups();
 
   const teiki = VACCINES.filter(v => v.type === '定期');
   const ninni = VACCINES.filter(v => v.type === '任意');
+
+  // 今月推奨・期限超過のカウント
+  const soonCount = VACCINES.filter(v => !child.vaccines[v.id] && calcVaxStatus(child.birth, v)?.cls === 'vax-soon').length;
+  const overdueCount = VACCINES.filter(v => !child.vaccines[v.id] && calcVaxStatus(child.birth, v)?.cls === 'vax-overdue').length;
+  if (summaryEl) {
+    let html = '';
+    if (overdueCount > 0) html += `<span class="vax-overdue" style="margin-right:.5rem">期限超過 ${overdueCount}件</span>`;
+    if (soonCount > 0) html += `<span class="vax-soon">今月推奨 ${soonCount}件</span>`;
+    summaryEl.innerHTML = html;
+  }
 
   el.innerHTML = `
     <div style="font-weight:700;color:var(--text);margin-bottom:.875rem">定期接種</div>
@@ -1221,14 +1328,17 @@ function renderVaccines() {
 
 function vaxHtml(v, child) {
   const date = child.vaccines[v.id] || '';
+  const status = !date ? calcVaxStatus(child.birth, v) : null;
+  const statusHtml = status ? `<span class="${status.cls}" style="flex-shrink:0">${status.label}</span>` : '';
   return `
     <div class="vax-item ${date ? 'done' : ''}">
-      <span class="vax-badge badge-${v.type === '定期' ? 'teiki' : 'ninni'}">${v.type}接種</span>
+      <span class="vax-badge badge-${v.type === '定期' ? 'teiki' : 'ninni'}">${v.type}</span>
       <div class="vax-info">
         <div class="vax-name">${v.name}</div>
         <div class="vax-timing">${v.timing}</div>
       </div>
-      ${date ? '<span style="color:var(--success);font-size:1.25rem">✅</span>' : ''}
+      ${statusHtml}
+      ${date ? '<span style="color:var(--success);font-size:1.25rem;flex-shrink:0">✅</span>' : ''}
       <input type="date" class="vax-date" value="${date}" onchange="saveVaccine('${v.id}',this.value)" title="接種日を入力">
     </div>`;
 }
@@ -1265,12 +1375,15 @@ function addMemory() {
 
   try {
     const now = new Date();
+    const inputDate = document.getElementById('mem-date').value || now.toISOString().slice(0, 10);
     child.memories.unshift({
       id: Date.now().toString(),
+      recordDate: inputDate,
       date: now.toLocaleString('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
       emoji: selEmoji || '📔',
       text,
     });
+    child.memories.sort((a, b) => (b.recordDate || b.date).localeCompare(a.recordDate || a.date));
     saveState();
     document.getElementById('mem-input').value = '';
     document.getElementById('sel-emoji').textContent = '';
@@ -1303,11 +1416,37 @@ function deleteMemory(id) {
 // ──────────────────────────────────
 // Render functions
 // ──────────────────────────────────
+function calcAgeMonths(birth) {
+  if (!birth) return 0;
+  const b = new Date(birth), now = new Date();
+  return Math.max(0, (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth()));
+}
+
+function calcKaup(h, w) {
+  if (!h || !w || h <= 0) return null;
+  return (w * 1000 / (h * h) * 10).toFixed(1);
+}
+
+function evalKaup(kaup, ageMonths) {
+  const k = parseFloat(kaup);
+  if (isNaN(k)) return null;
+  let low, high;
+  if (ageMonths <= 3) { low = 16; high = 18.5; }
+  else if (ageMonths <= 6) { low = 16; high = 18; }
+  else if (ageMonths <= 12) { low = 15.5; high = 17.5; }
+  else if (ageMonths <= 24) { low = 15; high = 17; }
+  else { low = 14.5; high = 17; }
+  if (k < low) return { label:'やせ気味', cls:'kaup-thin' };
+  if (k > high) return { label:'太り気味', cls:'kaup-fat' };
+  return { label:'標準', cls:'kaup-normal' };
+}
+
 function renderHero() {
   const child = activeChild();
   if (!child) return;
   document.getElementById('hero-name').textContent = child.name;
-  document.getElementById('hero-age').textContent = child.birth ? `${child.birth} 生まれ・${calcAge(child.birth)}` : '';
+  const ageMonths = calcAgeMonths(child.birth);
+  document.getElementById('hero-age').textContent = child.birth ? `${child.birth} 生まれ・${calcAge(child.birth)} / 記録${child.records.length}件` : '';
 
   const records = child.records;
   const hRecs = records.filter(r => r.h !== null);
@@ -1319,7 +1458,25 @@ function renderHero() {
 
   document.getElementById('stat-height').textContent = lastH ? lastH.h : '--';
   document.getElementById('stat-weight').textContent = lastW ? lastW.w : '--';
-  document.getElementById('stat-count').textContent = records.length;
+
+  // カウプ指数
+  const kaupEl = document.getElementById('stat-kaup');
+  const kaupEvalEl = document.getElementById('stat-kaup-eval');
+  if (kaupEl) {
+    if (lastH && lastW) {
+      const kaup = calcKaup(lastH.h, lastW.w);
+      kaupEl.textContent = kaup;
+      if (kaupEvalEl) {
+        const ev = evalKaup(kaup, ageMonths);
+        if (ev) {
+          kaupEvalEl.innerHTML = `<span class="kaup-badge ${ev.cls}">${ev.label}</span>`;
+        } else { kaupEvalEl.textContent = ''; }
+      }
+    } else {
+      kaupEl.textContent = '--';
+      if (kaupEvalEl) kaupEvalEl.textContent = '';
+    }
+  }
 
   const hDiffEl = document.getElementById('stat-height-diff');
   if (hDiffEl) {
@@ -1348,11 +1505,14 @@ function renderGrowth() {
   } else {
     const rows = [...child.records].reverse().map(r => `
       <tr>
-        <td>${r.date}</td>
-        <td>${r.h !== null ? r.h + ' cm' : '—'}</td>
-        <td>${r.w !== null ? r.w + ' kg' : '—'}</td>
-        <td style="color:var(--muted);font-size:.8125rem">${r.memo || ''}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">削除</button></td>
+        <td data-label="日付">${r.date}</td>
+        <td data-label="身長">${r.h !== null ? r.h + ' cm' : '—'}</td>
+        <td data-label="体重">${r.w !== null ? r.w + ' kg' : '—'}</td>
+        <td data-label="メモ" style="color:var(--muted);font-size:.8125rem">${r.memo || ''}</td>
+        <td data-label="" style="display:flex;gap:.375rem;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="editRecord('${r.id}')">編集</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">削除</button>
+        </td>
       </tr>`).join('');
     el.innerHTML = `<table class="data-table"><thead><tr><th>日付</th><th>身長</th><th>体重</th><th>メモ</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
   }
@@ -1366,14 +1526,194 @@ function renderMemories() {
     el.innerHTML = `<div class="empty"><div class="empty-icon">📔</div><div class="empty-title">思い出がまだありません</div><div class="empty-desc">上のフォームから記録しましょう</div></div>`;
     return;
   }
-  el.innerHTML = child.memories.map(m => `
+  el.innerHTML = child.memories.map(m => {
+    const dispDate = m.recordDate ? m.recordDate : m.date;
+    return `
     <div class="mem-card">
-      <div class="mem-date">${m.date}</div>
+      <div class="mem-date">${dispDate}</div>
       <div class="mem-text"><span class="mem-emoji">${m.emoji}</span>${m.text}</div>
       <div style="display:flex;justify-content:flex-end;margin-top:.875rem">
         <button class="btn btn-danger btn-sm" onclick="deleteMemory('${m.id}')">削除</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────
+// Chart tooltip
+// ──────────────────────────────────
+function showChartTip(event, cx, cy, text) {
+  event.stopPropagation();
+  const tip = document.getElementById('chart-tooltip');
+  if (!tip) return;
+  const svg = document.getElementById('chart-svg');
+  if (!svg) return;
+  const svgRect = svg.getBoundingClientRect();
+  const scaleX = svgRect.width / 660;
+  const scaleY = svgRect.height / 220;
+  tip.textContent = text;
+  tip.style.left = (cx * scaleX) + 'px';
+  tip.style.top = Math.max(0, (cy * scaleY - 12)) + 'px';
+  tip.style.opacity = '1';
+}
+
+function hideChartTip() {
+  const tip = document.getElementById('chart-tooltip');
+  if (tip) tip.style.opacity = '0';
+}
+
+// ──────────────────────────────────
+// Edit record
+// ──────────────────────────────────
+function editRecord(id) {
+  const child = activeChild();
+  if (!child) return;
+  const rec = child.records.find(r => r.id === id);
+  if (!rec) return;
+  document.getElementById('edit-record-id').value = id;
+  document.getElementById('edit-rec-date').value = rec.date;
+  document.getElementById('edit-rec-height').value = rec.h !== null ? rec.h : '';
+  document.getElementById('edit-rec-weight').value = rec.w !== null ? rec.w : '';
+  document.getElementById('edit-rec-memo').value = rec.memo || '';
+  openModal('modal-edit-record');
+}
+
+function saveEditRecord() {
+  const child = activeChild();
+  if (!child) return;
+  const id = document.getElementById('edit-record-id').value;
+  const date = document.getElementById('edit-rec-date').value;
+  const hRaw = document.getElementById('edit-rec-height').value;
+  const wRaw = document.getElementById('edit-rec-weight').value;
+  const memo = document.getElementById('edit-rec-memo').value.trim();
+  const h = parseFloat(hRaw);
+  const w = parseFloat(wRaw);
+  if (!date) { toast('err', '日付を入力してください'); return; }
+  if (hRaw === '' && wRaw === '') { toast('err', '身長か体重を入力してください'); return; }
+  if (hRaw !== '' && (isNaN(h) || h < 30 || h > 250)) { toast('err', '身長の値が正しくありません（30〜250cm）'); return; }
+  if (wRaw !== '' && (isNaN(w) || w < 0.5 || w > 300)) { toast('err', '体重の値が正しくありません（0.5〜300kg）'); return; }
+  try {
+    const rec = child.records.find(r => r.id === id);
+    if (!rec) return;
+    rec.date = date;
+    rec.h = hRaw !== '' ? h : null;
+    rec.w = wRaw !== '' ? w : null;
+    rec.memo = memo;
+    child.records.sort((a, b) => a.date.localeCompare(b.date));
+    saveState();
+    closeModal('modal-edit-record');
+    renderGrowth();
+    renderHero();
+    toast('ok', '記録を更新しました');
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] saveEditRecord:', e);
+  }
+}
+
+// ──────────────────────────────────
+// Data stats
+// ──────────────────────────────────
+function renderDataStats() {
+  const el = document.getElementById('data-stats');
+  if (!el) return;
+  const totalRecords = state.children.reduce((s, c) => s + (c.records?.length || 0), 0);
+  const totalMemories = state.children.reduce((s, c) => s + (c.memories?.length || 0), 0);
+  const totalMs = state.children.reduce((s, c) => s + Object.keys(c.milestones || {}).length, 0);
+  el.innerHTML = `<div style="background:var(--bg);border-radius:var(--radius-sm);padding:.75rem 1rem;font-size:.8125rem;color:var(--muted);margin-bottom:.25rem">
+    <strong style="color:var(--text)">現在のデータ:</strong>
+    子ども ${state.children.length}人 / 成長記録 ${totalRecords}件 / 思い出 ${totalMemories}件 / マイルストーン達成 ${totalMs}件
+  </div>`;
+}
+
+// ──────────────────────────────────
+// Checkups (乳幼児健診)
+// ──────────────────────────────────
+function calcVaxStatus(birth, vaccine) {
+  if (!birth || !vaccine.months) return null;
+  const b = new Date(birth);
+  const now = new Date();
+  const ageMonths = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
+  const nextDue = vaccine.months.find(m => m >= ageMonths - 1);
+  if (nextDue === undefined) return null;
+  const diffMonths = nextDue - ageMonths;
+  if (diffMonths < -1) return { label:'期限超過', cls:'vax-overdue' };
+  if (diffMonths <= 1) return { label:'今月推奨', cls:'vax-soon' };
+  if (diffMonths <= 3) return { label:`約${diffMonths}ヶ月後`, cls:'vax-upcoming' };
+  return null;
+}
+
+function renderCheckups() {
+  const child = activeChild();
+  const el = document.getElementById('checkup-section');
+  if (!el || !child || !child.birth) {
+    if (el) el.innerHTML = '';
+    return;
+  }
+  if (!child.checkups) child.checkups = {};
+  const birth = new Date(child.birth);
+  const now = new Date();
+
+  const rows = CHECKUPS.map(cu => {
+    const dueDate = new Date(birth);
+    dueDate.setMonth(dueDate.getMonth() + Math.round(cu.months));
+    const dueDateStr = dueDate.toISOString().slice(0, 10);
+    const done = child.checkups[cu.id] || '';
+    const diffDays = Math.round((dueDate - now) / (1000 * 60 * 60 * 24));
+    let statusHtml = '';
+    if (done) {
+      statusHtml = `<span style="background:#d1fae5;color:#065f46;padding:.2rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700">✅ 完了</span>`;
+    } else if (diffDays < -30) {
+      statusHtml = `<span class="vax-overdue">要確認</span>`;
+    } else if (diffDays <= 30 && diffDays >= -30) {
+      statusHtml = `<span class="vax-soon">まもなく</span>`;
+    } else if (diffDays > 30) {
+      const mo = Math.round(diffDays / 30);
+      statusHtml = `<span class="vax-upcoming">約${mo}ヶ月後</span>`;
+    }
+    const isDone = !!done;
+    const isUpcoming = !done && Math.abs(diffDays) <= 30;
+    return `
+      <div class="checkup-item ${isDone ? 'done' : isUpcoming ? 'upcoming' : ''}">
+        <span style="font-size:1.375rem;flex-shrink:0">${cu.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div class="checkup-name">${cu.name}</div>
+          <div class="checkup-timing">${cu.months < 12 ? cu.months + 'ヶ月' : (cu.months / 12) + '歳'}頃 / 推定 ${dueDateStr}</div>
+        </div>
+        ${statusHtml}
+        <input type="date" class="checkup-date-input" value="${done}" onchange="saveCheckup('${cu.id}',this.value)" title="健診実施日を入力">
+      </div>`;
+  }).join('');
+
+  const upcoming = CHECKUPS.filter(cu => {
+    if (child.checkups[cu.id]) return false;
+    const d = new Date(birth); d.setMonth(d.getMonth() + Math.round(cu.months));
+    const diff = Math.round((d - now) / (1000 * 60 * 60 * 24));
+    return Math.abs(diff) <= 30;
+  }).length;
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;flex-wrap:wrap;gap:.5rem">
+      <div style="font-weight:700;color:var(--text);font-size:.9375rem">🏥 乳幼児健診スケジュール</div>
+      ${upcoming > 0 ? `<span class="vax-soon">まもなく${upcoming}件</span>` : ''}
+    </div>
+    ${rows}
+    <div style="border-top:1px solid var(--border);margin-top:1rem;padding-top:.75rem"></div>`;
+}
+
+function saveCheckup(id, date) {
+  const child = activeChild();
+  if (!child) return;
+  if (!child.checkups) child.checkups = {};
+  try {
+    if (date) { child.checkups[id] = date; toast('ok', '健診日を記録しました'); }
+    else { delete child.checkups[id]; }
+    saveState();
+    renderCheckups();
+  } catch(e) {
+    toast('err', '保存エラーが発生しました');
+    console.error('[KidsGrowth] saveCheckup:', e);
+  }
 }
 
 function renderChildSelector() {
@@ -1418,7 +1758,10 @@ function switchTab(name) {
   document.getElementById(`panel-${name}`).classList.add('active');
 }
 
-function openModal(id) { document.getElementById(id).classList.add('active'); }
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  if (id === 'modal-settings') renderDataStats();
+}
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
 document.querySelectorAll('.overlay').forEach(el => {
@@ -1459,6 +1802,7 @@ function renderAll() {
     renderMilestones();
     renderVaccines();
     renderMemories();
+    renderCheckups();
   }
 }
 
@@ -1466,7 +1810,10 @@ function renderAll() {
 // Init
 // ──────────────────────────────────
 function init() {
-  document.getElementById('r-date').value = new Date().toISOString().slice(0, 10);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  document.getElementById('r-date').value = todayStr;
+  const memDateEl = document.getElementById('mem-date');
+  if (memDateEl) memDateEl.value = todayStr;
   loadState();
   if (state.children.length > 0 && !state.activeId) {
     state.activeId = state.children[0].id;
